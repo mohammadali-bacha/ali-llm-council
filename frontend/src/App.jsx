@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
+import Login from './components/Login';
 import { api } from './api';
 import './App.css';
 
@@ -9,11 +10,20 @@ function App() {
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem('llm_council_auth') === 'true'
+  );
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   // Load conversations on mount
   useEffect(() => {
-    loadConversations();
-  }, []);
+    if (isAuthenticated) {
+      loadConversations();
+    }
+  }, [isAuthenticated]);
 
   // Load conversation details when selected
   useEffect(() => {
@@ -180,6 +190,10 @@ function App() {
       setIsLoading(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <div className="app">
